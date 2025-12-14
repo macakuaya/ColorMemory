@@ -1,0 +1,317 @@
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'EB Garamond', serif;
+    background: #F5F5F5;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.container {
+    width: 100%;
+    max-width: 1400px;
+}
+
+header {
+    display: none;
+}
+
+.game-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+    padding: 20px 24px;
+    background: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #f1f1f1;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.info-item {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-size: 0.9375rem;
+}
+
+.label {
+    font-weight: 500;
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+.info-item span:not(.label):not(.total) {
+    font-weight: 700;
+    color: #312e2b;
+    font-size: 1.5rem;
+}
+
+.total {
+    color: #9ca3af;
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+.new-game-btn {
+    background: #312e2b;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'EB Garamond', serif;
+}
+
+.new-game-btn:hover {
+    background: #1a1816;
+    transform: translateY(-1px);
+}
+
+.new-game-btn:active {
+    transform: translateY(0);
+}
+
+.game-board {
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+    gap: 8px;
+    margin-bottom: 24px;
+    justify-content: center;
+}
+
+.card {
+    width: 100px;
+    height: 100px;
+    border-radius: 3px;
+    cursor: pointer;
+    position: relative;
+    perspective: 1200px;
+    flex-shrink: 0;
+    transition: transform 100ms cubic-bezier(0, 0, 0.4, 1);
+}
+
+.card:hover:not(.flipped):not(.matched) {
+    transform: scale(1.03);
+    transition: transform 100ms cubic-bezier(0, 0, 0.4, 1);
+}
+
+.card.flipped,
+.card.matched {
+    pointer-events: none;
+}
+
+.card.flipped:hover,
+.card.matched:hover {
+    transform: none;
+}
+
+.card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000000;
+    opacity: 0;
+    border-radius: 3px;
+    pointer-events: none;
+    z-index: 10;
+    transition: opacity 100ms cubic-bezier(0, 0, 0.4, 1);
+}
+
+.card:hover:not(.flipped):not(.matched):not([style*="transform"])::after {
+    opacity: 0.05;
+    transition: opacity 100ms cubic-bezier(0, 0, 0.4, 1);
+}
+
+.card:not(:hover)::after,
+.card.flipped::after,
+.card[style*="transform"]::after {
+    transition: opacity 100ms cubic-bezier(0, 0, 0.4, 1);
+}
+
+.card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
+    border-radius: 3px;
+    pointer-events: none;
+}
+
+.card.flipped .card-inner {
+    transform: rotateY(180deg);
+}
+
+.card.matched {
+    cursor: default;
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.card.matched .card-inner {
+    animation: matchSuccess 0.6s ease;
+}
+
+@keyframes matchSuccess {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.card-back,
+.card-front {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card:hover:not(.flipped):not(.matched) .card-back,
+.card:hover:not(.flipped):not(.matched) .card-front {
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.05);
+}
+
+.card-back {
+    background: #ffffff;
+    border: 1px solid #f1f1f1;
+}
+
+.card-back::before {
+    content: '★';
+    font-size: 24px;
+    color: #312e2b;
+}
+
+.card-front {
+    transform: rotateY(180deg);
+    padding: 8px;
+}
+
+.card.color-card .card-front {
+    background: var(--card-color);
+    border: 1px solid #f1f1f1;
+}
+
+.card.name-card .card-front {
+    background: #ffffff;
+    color: #312e2b;
+    border: 1px solid #f1f1f1;
+    font-size: 16px;
+    font-weight: 700;
+    font-family: 'EB Garamond', serif;
+    text-align: center;
+    line-height: normal;
+}
+
+.card.flipped.name-card .card-front {
+    border-color: #f1f1f1;
+}
+
+.card.matched .card-front {
+    border-color: #10b981;
+}
+
+.card.matched .card-front.matched-text {
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    padding: 8px;
+    line-height: 1.2;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Extra legibility for light colors with dark text */
+.card.matched .card-front.matched-text[style*="color: #312e2b"] {
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+.win-message {
+    text-align: center;
+    padding: 56px 40px;
+    background: #312e2b;
+    color: white;
+    border-radius: 12px;
+    margin-top: 32px;
+}
+
+.win-message.hidden {
+    display: none;
+}
+
+.win-message h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    letter-spacing: -0.02em;
+}
+
+.win-message p {
+    font-size: 1.125rem;
+    margin-bottom: 8px;
+    color: #d1d5db;
+    font-weight: 400;
+}
+
+.final-score {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 24px 0;
+    color: #ffffff;
+}
+
+.win-message .new-game-btn {
+    background: #ffffff;
+    color: #312e2b;
+    margin-top: 8px;
+}
+
+.win-message .new-game-btn:hover {
+    background: #f3f4f6;
+}
+
+/* Responsive grid - cards always 100px x 100px */
+@media (max-width: 1024px) {
+    .game-board {
+        grid-template-columns: repeat(6, 100px);
+    }
+}
+
+@media (max-width: 768px) {
+    .game-board {
+        grid-template-columns: repeat(4, 100px);
+    }
+}
+
+@media (max-width: 480px) {
+    .game-board {
+        grid-template-columns: repeat(3, 100px);
+    }
+}
+
+

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Memory Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="game-info">
+            <div class="info-item">
+                <span class="label">Moves:</span>
+                <span id="moves">0</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Matches:</span>
+                <span id="matches">0</span>
+                <span class="total">/ 4</span>
+            </div>
+            <button id="new-game-btn" class="new-game-btn">New Game</button>
+        </div>
+
+        <div id="game-board" class="game-board"></div>
+
+        <div id="win-message" class="win-message hidden">
+            <h2>Perfect Match!</h2>
+            <p>You've successfully matched all colors</p>
+            <p class="final-score">Completed in <span id="final-moves"></span> moves</p>
+            <button id="play-again-btn" class="new-game-btn">Play Again</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Auto-reload on file changes
+        (function() {
+            let fileHashes = {
+                css: null,
+                js: null,
+                html: null
+            };
+            
+            async function getFileHash(url) {
+                try {
+                    const response = await fetch(url + '?t=' + Date.now());
+                    const text = await response.text();
+                    // Simple hash - just use length and first/last chars as quick check
+                    return text.length + text.substring(0, 50) + text.substring(text.length - 50);
+                } catch (e) {
+                    return null;
+                }
+            }
+            
+            async function checkForChanges() {
+                // Check CSS
+                const cssHash = await getFileHash('style.css');
+                if (fileHashes.css && cssHash && fileHashes.css !== cssHash) {
+                    const link = document.querySelector('link[href*="style.css"]');
+                    if (link) {
+                        link.href = 'style.css?t=' + Date.now();
+                        fileHashes.css = cssHash;
+                    }
+                } else if (!fileHashes.css) {
+                    fileHashes.css = cssHash;
+                }
+                
+                // Check JS - reload page if changed
+                const jsHash = await getFileHash('script.js');
+                if (fileHashes.js && jsHash && fileHashes.js !== jsHash) {
+                    location.reload();
+                } else if (!fileHashes.js) {
+                    fileHashes.js = jsHash;
+                }
+                
+                // Check HTML - reload if changed
+                const htmlHash = await getFileHash('index.html');
+                if (fileHashes.html && htmlHash && fileHashes.html !== htmlHash) {
+                    location.reload();
+                } else if (!fileHashes.html) {
+                    fileHashes.html = htmlHash;
+                }
+            }
+            
+            // Check every 300ms for fast updates
+            setInterval(checkForChanges, 300);
+        })();
+    </script>
+</body>
+</html>
+
