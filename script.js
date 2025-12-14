@@ -103,6 +103,8 @@ let flippedCards = [];
 let matchedPairs = 0;
 let moves = 0;
 let isProcessing = false;
+let activeTimeouts = []; // Track active timeouts to cancel on reset
+let gameInstanceId = 0; // Track game instances to prevent stale callbacks
 
 // DOM elements
 const gameBoard = document.getElementById('game-board');
@@ -115,6 +117,11 @@ const finalMovesDisplay = document.getElementById('final-moves');
 
 // Initialize game
 function initGame() {
+    // Increment game instance ID to invalidate any pending callbacks
+    gameInstanceId++;
+    // Cancel all active timeouts to prevent race conditions
+    activeTimeouts.forEach(timeoutId => clearTimeout(timeoutId));
+    activeTimeouts = [];
     // Reset game state
     matchedPairs = 0;
     moves = 0;
@@ -122,9 +129,9 @@ function initGame() {
     isProcessing = false;
     cards = [];
     
-    // Randomly select 4 colors for testing (3x3 grid = 9 positions, 8 cards = 4 pairs)
+    // Randomly select 8 colors (4x4 grid = 16 positions, 16 cards = 8 pairs)
     const shuffled = [...allColors].sort(() => Math.random() - 0.5);
-    selectedColors = shuffled.slice(0, 4);
+    selectedColors = shuffled.slice(0, 8);
     
     // Create cards: 32 color swatches + 32 color names
     cards = [];
@@ -235,45 +242,68 @@ function checkMatch() {
                     first.card.type !== second.card.type;
     
     if (isMatch) {
-        // Match found!
-        setTimeout(() => {
-            first.element.classList.add('matched');
-            second.element.classList.add('matched');
+        // Match found! Wait for flip animation to finish, then show match state instantly
+        const color = first.card.color;
+        const brightness = getBrightness(color.hex);
+        const textColor = brightness > 128 ? '#312e2b' : '#ffffff';
+        
+        // Mark cards as matched immediately
+        first.element.classList.add('matched');
+        second.element.classList.add('matched');
+        
+        // Wait for flip animation to finish (500ms), then show match state instantly
+        const currentInstanceId = gameInstanceId;
+        const matchTimeoutId = setTimeout(() => {
+            // Check if game was reset (instance changed or DOM invalid)
+            if (gameInstanceId !== currentInstanceId || cards.length === 0 || !first.element.parentNode || !second.element.parentNode) {
+                return;
+            }
             
-            // Update matched cards to show color + name
-            const color = first.card.color;
-            const brightness = getBrightness(color.hex);
-            const textColor = brightness > 128 ? '#312e2b' : '#ffffff';
-            
-            // Update both cards to show the same: color background + name
             [first.element, second.element].forEach(cardEl => {
                 const cardFront = cardEl.querySelector('.card-front');
                 if (cardFront) {
+                    cardFront.classList.add('matched-text');
+                    // No transition - instant change
+                    cardFront.style.transition = 'none';
                     cardFront.style.background = color.hex;
                     cardFront.style.color = textColor;
                     cardFront.textContent = color.name;
-                    cardFront.classList.add('matched-text');
                 }
             });
             
+            // Complete the match
             flippedCards = [];
             matchedPairs++;
             updateDisplay();
             isProcessing = false;
             
             // Check for win
-            if (matchedPairs === 4) {
-                setTimeout(showWinMessage, 500);
+            if (matchedPairs === 8 && cards.length > 0) {
+                const winInstanceId = gameInstanceId;
+                const winTimeoutId = setTimeout(() => {
+                    if (gameInstanceId === winInstanceId && cards.length > 0) {
+                        showWinMessage();
+                    }
+                }, 500);
+                activeTimeouts.push(winTimeoutId);
             }
-        }, 500);
+        }, 500); // Wait for flip animation (500ms)
+        activeTimeouts.push(matchTimeoutId);
     } else {
         // No match - flip back
-        setTimeout(() => {
+        const currentInstanceId = gameInstanceId;
+        const noMatchTimeoutId = setTimeout(() => {
+            // Check if game was reset (instance changed or DOM invalid)
+            if (gameInstanceId !== currentInstanceId || cards.length === 0 || !first.element.parentNode || !second.element.parentNode) {
+                return;
+            }
+            
             first.element.classList.remove('flipped');
             second.element.classList.remove('flipped');
             flippedCards = [];
             isProcessing = false;
         }, 1000);
+        activeTimeouts.push(noMatchTimeoutId);
     }
 }
 

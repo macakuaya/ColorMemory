@@ -4,10 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Color Memory Game</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg?v=1">
+    <link rel="shortcut icon" href="favicon.svg?v=1">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
+        <div id="game-board" class="game-board"></div>
+
         <div class="game-info">
             <div class="info-item">
                 <span class="label">Moves:</span>
@@ -16,12 +20,10 @@
             <div class="info-item">
                 <span class="label">Matches:</span>
                 <span id="matches">0</span>
-                <span class="total">/ 4</span>
+                <span class="total">/ 8</span>
             </div>
             <button id="new-game-btn" class="new-game-btn">New Game</button>
         </div>
-
-        <div id="game-board" class="game-board"></div>
 
         <div id="win-message" class="win-message hidden">
             <h2>Perfect Match!</h2>
