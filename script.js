@@ -106,6 +106,63 @@ let isProcessing = false;
 let activeTimeouts = []; // Track active timeouts to cancel on reset
 let gameInstanceId = 0; // Track game instances to prevent stale callbacks
 
+// Audio context for sound effects
+let audioContext = null;
+
+// Initialize audio context
+function initAudio() {
+    if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+}
+
+// Play a cute sound
+function playSound(frequency, duration, type = 'sine', volume = 0.3) {
+    if (!audioContext) initAudio();
+    
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    oscillator.frequency.value = frequency;
+    oscillator.type = type;
+    
+    gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+    gainNode.gain.linearRampToValueAtTime(volume, audioContext.currentTime + 0.01);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+    
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + duration);
+}
+
+// Sound effects
+function playFlipSound() {
+    playSound(400, 0.1, 'sine', 0.2);
+}
+
+function playMatchSound() {
+    // Cute ascending notes
+    playSound(523.25, 0.15, 'sine', 0.25); // C5
+    setTimeout(() => playSound(659.25, 0.15, 'sine', 0.25), 50); // E5
+    setTimeout(() => playSound(783.99, 0.2, 'sine', 0.25), 100); // G5
+}
+
+function playNoMatchSound() {
+    // Gentle descending note
+    playSound(400, 0.2, 'sine', 0.15);
+    setTimeout(() => playSound(300, 0.2, 'sine', 0.15), 100);
+}
+
+function playWinSound() {
+    // Happy ascending scale
+    const notes = [523.25, 587.33, 659.25, 698.46, 783.99]; // C, D, E, F, G
+    notes.forEach((freq, i) => {
+        setTimeout(() => playSound(freq, 0.2, 'sine', 0.3), i * 80);
+    });
+}
+
 // DOM elements
 const gameBoard = document.getElementById('game-board');
 const movesDisplay = document.getElementById('moves');
@@ -222,6 +279,7 @@ function handleCardClick(index) {
     // Flip the card
     cardElement.classList.add('flipped');
     flippedCards.push({ index, card, element: cardElement });
+    playFlipSound();
     
     // Check for match when 2 cards are flipped
     if (flippedCards.length === 2) {
@@ -243,6 +301,7 @@ function checkMatch() {
     
     if (isMatch) {
         // Match found! Wait for flip animation to finish, then show match state instantly
+        playMatchSound();
         const color = first.card.color;
         const brightness = getBrightness(color.hex);
         const textColor = brightness > 128 ? '#312e2b' : '#ffffff';
@@ -291,6 +350,7 @@ function checkMatch() {
         activeTimeouts.push(matchTimeoutId);
     } else {
         // No match - flip back
+        playNoMatchSound();
         const currentInstanceId = gameInstanceId;
         const noMatchTimeoutId = setTimeout(() => {
             // Check if game was reset (instance changed or DOM invalid)
@@ -315,7 +375,7 @@ function updateDisplay() {
 
 // Show win message
 function showWinMessage() {
-    finalMovesDisplay.textContent = moves;
+    playWinSound();
     winMessage.classList.remove('hidden');
 }
 

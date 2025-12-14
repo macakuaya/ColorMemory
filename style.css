@@ -259,11 +259,15 @@ header {
 
 .win-message {
     text-align: center;
-    padding: 56px 40px;
+    padding: 20px 24px;
     background: #312e2b;
     color: white;
-    border-radius: 12px;
-    margin-top: 32px;
+    border-radius: 3px;
+    margin-top: 24px;
+    width: 424px;
+    margin-left: auto;
+    margin-right: auto;
+    box-sizing: border-box;
 }
 
 .win-message.hidden {
@@ -271,23 +275,23 @@ header {
 }
 
 .win-message h2 {
-    font-size: 2.5rem;
+    font-size: 1.5rem;
     font-weight: 700;
-    margin-bottom: 16px;
+    margin-bottom: 8px;
     letter-spacing: -0.02em;
 }
 
 .win-message p {
-    font-size: 1.125rem;
-    margin-bottom: 8px;
+    font-size: 0.9375rem;
+    margin-bottom: 4px;
     color: #d1d5db;
     font-weight: 400;
 }
 
 .final-score {
-    font-size: 1.5rem;
+    font-size: 1rem;
     font-weight: 600;
-    margin: 24px 0;
+    margin: 12px 0;
     color: #ffffff;
 }
 
