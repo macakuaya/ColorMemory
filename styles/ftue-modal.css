@@ -1,0 +1,270 @@
+/**
+ * FTUE Modal Styles
+ */
+.ftue-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.ftue-modal.hidden {
+    display: none;
+}
+
+.ftue-modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+}
+
+.ftue-modal-content {
+    position: relative;
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 32px;
+    max-width: 500px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    z-index: 1001;
+}
+
+.ftue-modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: none;
+    border: none;
+    font-size: 32px;
+    color: #6b7280;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    padding: 0;
+    transition: color 0.2s ease;
+    font-family: 'EB Garamond', serif;
+}
+
+.ftue-modal-close:hover {
+    color: #312e2b;
+}
+
+.ftue-modal-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #312e2b;
+    margin-bottom: 24px;
+    font-family: 'EB Garamond', serif;
+}
+
+.ftue-modal-body {
+    margin-bottom: 24px;
+}
+
+.ftue-instruction {
+    font-size: 1.125rem;
+    color: #312e2b;
+    margin-bottom: 20px;
+    font-weight: 500;
+    line-height: 1.6;
+}
+
+.ftue-steps {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 32px 0;
+}
+
+.ftue-steps li {
+    font-size: 1rem;
+    color: #4b5563;
+    margin-bottom: 12px;
+    padding-left: 24px;
+    position: relative;
+    line-height: 1.6;
+}
+
+.ftue-steps li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: #312e2b;
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.ftue-example {
+    background: #f9fafb;
+    border-radius: 6px;
+    padding: 20px;
+    border: 1px solid #f1f1f1;
+}
+
+.ftue-example-title {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: #312e2b;
+    margin-bottom: 16px;
+}
+
+.ftue-example-cards {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 16px;
+}
+
+.ftue-example-card {
+    width: 80px;
+    height: 80px;
+    border-radius: 3px;
+    cursor: pointer;
+    position: relative;
+    perspective: 1200px;
+    transition: transform 100ms cubic-bezier(0, 0, 0.4, 1);
+}
+
+.ftue-example-card:hover:not(.ftue-flipped):not(.ftue-matched) {
+    transform: scale(1.03);
+}
+
+.ftue-example-card.ftue-flipped {
+    cursor: default;
+}
+
+.ftue-example-card.ftue-matched {
+    cursor: default;
+    pointer-events: none;
+}
+
+.ftue-example-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transform: rotateY(0deg);
+    border-radius: 3px;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+    will-change: transform;
+}
+
+.ftue-example-card.ftue-flipped .ftue-example-card-inner,
+.ftue-example-card.ftue-matched .ftue-example-card-inner {
+    transform: rotateY(180deg);
+}
+
+.ftue-example-card-back,
+.ftue-example-card-front {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #f1f1f1;
+}
+
+.ftue-example-card-back {
+    background: #ffffff;
+}
+
+.ftue-example-card-back::before {
+    content: '★';
+    font-size: 20px;
+    color: #312e2b;
+}
+
+.ftue-example-card-front {
+    transform: rotateY(180deg);
+    background: var(--card-color, #ffffff);
+    font-size: 12px;
+    font-weight: 700;
+    color: #312e2b;
+    font-family: 'EB Garamond', serif;
+    padding: 4px;
+    text-align: center;
+}
+
+.ftue-example-card.ftue-matched .ftue-example-card-front {
+    background: var(--ftue-matched-color, #FF6B6B);
+    color: var(--ftue-matched-text-color, #312e2b);
+}
+
+.ftue-example-text {
+    font-size: 0.875rem;
+    color: #6b7280;
+    text-align: center;
+    line-height: 1.5;
+    margin-bottom: 12px;
+}
+
+.ftue-modal-button {
+    width: 100%;
+    background: #312e2b;
+    color: white;
+    border: none;
+    padding: 14px 24px;
+    border-radius: 3px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'EB Garamond', serif;
+}
+
+.ftue-modal-button:hover:not(:disabled) {
+    background: #1a1816;
+    transform: translateY(-1px);
+}
+
+.ftue-modal-button:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.ftue-modal-button:disabled {
+    background: #d1d5db;
+    color: #9ca3af;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+@media (max-width: 480px) {
+    .ftue-modal-content {
+        padding: 24px;
+    }
+    
+    .ftue-modal-title {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+    }
+    
+    .ftue-example-cards {
+        gap: 8px;
+    }
+    
+    .ftue-example-card {
+        width: 60px;
+        height: 60px;
+    }
+}
+
+

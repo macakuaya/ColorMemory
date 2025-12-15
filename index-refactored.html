@@ -69,21 +69,20 @@
         </div>
     </div>
 
+    <!-- Use refactored modular version -->
     <script type="module" src="script-refactored.js"></script>
+    
+    <!-- Optional: Auto-reload for development (remove in production) -->
+    <!--
     <script>
-        // Auto-reload on file changes
+        // Auto-reload on file changes (development only)
         (function() {
-            let fileHashes = {
-                css: null,
-                js: null,
-                html: null
-            };
+            let fileHashes = { css: null, js: null, html: null };
             
             async function getFileHash(url) {
                 try {
                     const response = await fetch(url + '?t=' + Date.now());
                     const text = await response.text();
-                    // Simple hash - just use length and first/last chars as quick check
                     return text.length + text.substring(0, 50) + text.substring(text.length - 50);
                 } catch (e) {
                     return null;
@@ -91,7 +90,6 @@
             }
             
             async function checkForChanges() {
-                // Check CSS
                 const cssHash = await getFileHash('style.css');
                 if (fileHashes.css && cssHash && fileHashes.css !== cssHash) {
                     const link = document.querySelector('link[href*="style.css"]');
@@ -103,16 +101,14 @@
                     fileHashes.css = cssHash;
                 }
                 
-                // Check JS - reload page if changed
-                const jsHash = await getFileHash('script.js');
+                const jsHash = await getFileHash('script-refactored.js');
                 if (fileHashes.js && jsHash && fileHashes.js !== jsHash) {
                     location.reload();
                 } else if (!fileHashes.js) {
                     fileHashes.js = jsHash;
                 }
                 
-                // Check HTML - reload if changed
-                const htmlHash = await getFileHash('index.html');
+                const htmlHash = await getFileHash('index-refactored.html');
                 if (fileHashes.html && htmlHash && fileHashes.html !== htmlHash) {
                     location.reload();
                 } else if (!fileHashes.html) {
@@ -120,10 +116,10 @@
                 }
             }
             
-            // Check every 300ms for fast updates
             setInterval(checkForChanges, 300);
         })();
     </script>
+    -->
 </body>
 </html>
 

@@ -171,6 +171,10 @@ const newGameBtn = document.getElementById('new-game-btn');
 const playAgainBtn = document.getElementById('play-again-btn');
 const winMessage = document.getElementById('win-message');
 const finalMovesDisplay = document.getElementById('final-moves');
+const ftueModal = document.getElementById('ftue-modal');
+const ftueCloseBtn = document.getElementById('ftue-close-btn');
+const ftueGotItBtn = document.getElementById('ftue-got-it-btn');
+const ftueModalOverlay = document.querySelector('.ftue-modal-overlay');
 
 // Initialize game
 function initGame() {
@@ -379,10 +383,226 @@ function showWinMessage() {
     winMessage.classList.remove('hidden');
 }
 
+// FTUE Modal functions
+let ftueFlippedCards = [];
+let ftueIsProcessing = false;
+
+function showFTUEModal() {
+    if (ftueModal) {
+        ftueModal.classList.remove('hidden');
+        // Reset example cards
+        resetFTUEExample();
+        // Set up event listeners for example cards
+        setTimeout(() => {
+            setupFTUEExampleCards();
+        }, 100);
+    }
+}
+
+function hideFTUEModal() {
+    if (ftueModal) {
+        ftueModal.classList.add('hidden');
+        // Save to localStorage that user has seen the modal
+        localStorage.setItem('colorMemoryFTUESeen', 'true');
+        // Reset example cards
+        resetFTUEExample();
+    }
+}
+
+function resetFTUEExample() {
+    const exampleCards = document.querySelectorAll('.ftue-example-card');
+    exampleCards.forEach(card => {
+        card.classList.remove('ftue-flipped', 'ftue-matched');
+        const cardInner = card.querySelector('.ftue-example-card-inner');
+        if (cardInner) {
+            // Remove inline transform to let CSS handle it
+            cardInner.style.transform = '';
+        }
+        // Reset card front to original state
+        const cardFront = card.querySelector('.ftue-example-card-front');
+        if (cardFront) {
+            const cardType = card.dataset.ftueCard;
+            const cardColor = card.dataset.ftueColor;
+            const cardName = card.dataset.ftueName;
+            
+            // Clear inline styles that might interfere
+            cardFront.style.background = '';
+            cardFront.style.color = '';
+            cardFront.textContent = '';
+            
+            if (cardType === 'color') {
+                // Color card: show just the color background, no text
+                cardFront.style.background = cardColor;
+            } else {
+                // Name card: show white background with text
+                cardFront.style.background = '#ffffff';
+                cardFront.style.color = '#312e2b';
+                cardFront.textContent = cardName;
+            }
+        }
+    });
+    ftueFlippedCards = [];
+    ftueIsProcessing = false;
+    
+    const exampleText = document.getElementById('ftue-example-text');
+    if (exampleText) {
+        exampleText.textContent = 'Click the cards to flip them and find the match!';
+    }
+    
+    // Disable the "Got it!" button
+    if (ftueGotItBtn) {
+        ftueGotItBtn.disabled = true;
+    }
+}
+
+function handleFTUECardClick(cardElement) {
+    if (ftueIsProcessing) return;
+    
+    // Don't allow clicking already flipped or matched cards
+    if (cardElement.classList.contains('ftue-flipped') || 
+        cardElement.classList.contains('ftue-matched')) {
+        return;
+    }
+    
+    // Don't allow clicking more than 2 cards
+    if (ftueFlippedCards.length >= 2) return;
+    
+    // Flip the card
+    cardElement.classList.add('ftue-flipped');
+    ftueFlippedCards.push(cardElement);
+    playFlipSound();
+    
+    // Check for match when 2 cards are flipped
+    if (ftueFlippedCards.length === 2) {
+        ftueIsProcessing = true;
+        setTimeout(() => {
+            checkFTUEMatch();
+        }, 500); // Wait for flip animation
+    }
+}
+
+function checkFTUEMatch() {
+    const [first, second] = ftueFlippedCards;
+    const firstColor = first.dataset.ftueColor;
+    const firstName = first.dataset.ftueName;
+    const secondColor = second.dataset.ftueColor;
+    const secondName = second.dataset.ftueName;
+    
+    // Match if they have the same color and name
+    const isMatch = firstColor === secondColor && firstName === secondName;
+    
+    if (isMatch) {
+        // Match found!
+        playMatchSound();
+        
+        // Update both cards to show the matched state (wait for flip animation to finish)
+        const color = firstColor;
+        const brightness = getBrightness(color);
+        const textColor = brightness > 128 ? '#312e2b' : '#ffffff';
+        
+        setTimeout(() => {
+            [first, second].forEach(cardEl => {
+                const cardFront = cardEl.querySelector('.ftue-example-card-front');
+                if (cardFront) {
+                    cardFront.style.background = color;
+                    cardFront.style.color = textColor;
+                    cardFront.textContent = firstName;
+                }
+            });
+            
+            // Mark as matched after showing the match state
+            first.classList.add('ftue-matched');
+            second.classList.add('ftue-matched');
+            first.classList.remove('ftue-flipped');
+            second.classList.remove('ftue-flipped');
+            
+            // Update text
+            const exampleText = document.getElementById('ftue-example-text');
+            if (exampleText) {
+                exampleText.textContent = 'Perfect! These two cards match!';
+            }
+            
+            // Enable the "Got it!" button
+            if (ftueGotItBtn) {
+                ftueGotItBtn.disabled = false;
+            }
+            
+            ftueFlippedCards = [];
+            ftueIsProcessing = false;
+        }, 500); // Wait for flip animation to finish
+    } else {
+        // No match - flip back
+        playNoMatchSound();
+        setTimeout(() => {
+            first.classList.remove('ftue-flipped');
+            second.classList.remove('ftue-flipped');
+            ftueFlippedCards = [];
+            ftueIsProcessing = false;
+        }, 1000);
+    }
+}
+
+function checkFTUE() {
+    // Check if user has seen the FTUE modal before
+    const hasSeenFTUE = localStorage.getItem('colorMemoryFTUESeen');
+    if (!hasSeenFTUE) {
+        // Show modal after a short delay for better UX
+        setTimeout(() => {
+            showFTUEModal();
+        }, 300);
+    }
+}
+
 // Event listeners
 newGameBtn.addEventListener('click', initGame);
 playAgainBtn.addEventListener('click', initGame);
 
+// FTUE Modal event listeners
+if (ftueCloseBtn) {
+    ftueCloseBtn.addEventListener('click', hideFTUEModal);
+}
+
+if (ftueGotItBtn) {
+    ftueGotItBtn.addEventListener('click', hideFTUEModal);
+}
+
+if (ftueModalOverlay) {
+    ftueModalOverlay.addEventListener('click', hideFTUEModal);
+}
+
+// FTUE Example cards interactivity
+document.addEventListener('DOMContentLoaded', () => {
+    const exampleCards = document.querySelectorAll('.ftue-example-card');
+    exampleCards.forEach(card => {
+        card.addEventListener('click', () => handleFTUECardClick(card));
+    });
+});
+
+// Also set up listeners after modal is shown (in case DOMContentLoaded already fired)
+function setupFTUEExampleCards() {
+    const exampleCards = document.querySelectorAll('.ftue-example-card');
+    exampleCards.forEach(card => {
+        // Remove any existing event listeners by cloning (without listeners)
+        const newCard = card.cloneNode(true);
+        card.parentNode.replaceChild(newCard, card);
+        // Add click listener
+        newCard.addEventListener('click', (e) => {
+            e.stopPropagation();
+            handleFTUECardClick(newCard);
+        });
+    });
+}
+
+// Close modal on Escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && ftueModal && !ftueModal.classList.contains('hidden')) {
+        hideFTUEModal();
+    }
+});
+
 // Start the game
 initGame();
+
+// Check and show FTUE modal if needed
+checkFTUE();
 

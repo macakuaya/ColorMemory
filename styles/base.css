@@ -1,0 +1,72 @@
+/**
+ * Base styles and reset
+ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'EB Garamond', serif;
+    background: #F5F5F5;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.container {
+    width: 100%;
+    max-width: 1400px;
+}
+
+.game-layout {
+    display: flex;
+    gap: 32px;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.game-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Responsive layout */
+@media (max-width: 1024px) {
+    .game-layout {
+        flex-direction: column;
+        align-items: center;
+        gap: 24px;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 16px;
+        align-items: flex-start;
+        padding-top: 16px;
+    }
+    
+    .game-layout {
+        gap: 16px;
+        width: 100%;
+    }
+    
+    .game-area {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 12px;
+        padding-top: 12px;
+    }
+}
+
